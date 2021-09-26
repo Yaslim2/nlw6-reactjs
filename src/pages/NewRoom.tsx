@@ -1,4 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { FormEvent, useState } from 'react'
+
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // imagens
 import illustrationImg from "../assets/images/illustration.svg";
@@ -13,8 +17,31 @@ import { useAuth } from "../hooks/useAuth";
 // css
 import "../styles/auth.scss";
 
+// firebase
+import { database } from "../services/firebaseConnection";
+
 export function NewRoom() {
+  const history = useHistory()
   const { user } = useAuth();
+
+  const [newRoom, setNewRoom] = useState('')
+
+  async function handleCreateRoom(event: FormEvent) {
+    event.preventDefault()
+
+    if (newRoom.trim() === '') {
+      toast.warn('Digite um nome para a sala')
+      return
+    }
+    const roomRef = database.ref('rooms')
+
+    const firebaseRoom = await roomRef.push({
+      title: newRoom,
+      authorId: user?.id
+    })
+
+    history.push(`/rooms/${firebaseRoom.key}`)
+  }
 
   return (
     <div id="page-auth">
@@ -31,10 +58,15 @@ export function NewRoom() {
         <div className="main-content">
           <img src={logoImg} alt="Logo da aplicação" />
           <h2>Criar uma nova sala</h2>
-          <form>
-            <input type="text" placeholder="Código da sala" />
+          <form onSubmit={handleCreateRoom}>
+            <input
+              type="text"
+              placeholder="Nome da sala"
+              onChange={event => setNewRoom(event.target.value)}
+              value={newRoom}
+            />
 
-            <Button type="submit">
+            <Button disabled={!user} type="submit">
               <img src={playIcon} alt="icone de play" />
               Criar sala
             </Button>
@@ -46,6 +78,18 @@ export function NewRoom() {
           </p>
         </div>
       </main>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='colored'
+      />
     </div>
   );
 }

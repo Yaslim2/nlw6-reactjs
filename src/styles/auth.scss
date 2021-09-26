@@ -53,12 +53,28 @@
       margin-bottom: 45px;
     }
 
-    h1 {
-      font-size: 30px;
-      margin-bottom: 34px;
-      text-align: center;
-      font-family: "Poppins", sans-serif;
-      font-weight: 400;
+    .create-room {
+      height: 50px;
+      border-radius: 8px;
+      font-weight: 500;
+      background-color: #ea4335;
+      color: #fff;
+  
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 0;
+  
+      transition: filter 0.2s;
+  
+      img {
+        margin-right: 8px;
+      }
+  
+      &:hover {
+        filter: brightness(0.9);
+      }
     }
 
     h2 {
@@ -100,29 +116,6 @@
     }
   }
 
-  .create-room {
-    height: 50px;
-    border-radius: 8px;
-    font-weight: 500;
-    background-color: #ea4335;
-    color: #fff;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: 0;
-
-    transition: filter 0.2s;
-
-    img {
-      margin-right: 8px;
-    }
-
-    &:hover {
-      filter: brightness(0.9);
-    }
-  }
 
   .separator {
     font-size: 14px;
