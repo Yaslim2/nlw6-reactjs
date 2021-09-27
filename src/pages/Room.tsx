@@ -8,12 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 // imagens
 import logoImg from "../assets/images/logo.svg";
 import emptyQuestionsImg from '../assets/images/empty-questions.svg'
-import errorImg from '../assets/images/alert-circle.svg'
 
 // componentes
 import { Button } from "../components/Button";
 import { Question } from "../components/Question";
 import { RoomCode } from "../components/RoomCode";
+import { ErrorPage } from "./ErrorPage";
+import { Loading } from "../components/Loading";
 
 // hooks
 import { useAuth } from "../hooks/useAuth";
@@ -24,7 +25,7 @@ import { database } from "../services/firebaseConnection";
 
 // css
 import "../styles/room.scss";
-import { Loading } from "../components/Loading";
+
 
 type Params = {
     id: string;
@@ -49,7 +50,7 @@ export function Room() {
             setLoading(false)
         }
         checkIsFinished()
-    }, [])
+    }, [roomId])
 
     const { questions, title } = useRoom(roomId)
 
@@ -83,8 +84,12 @@ export function Room() {
     }
 
     async function handleSignInWithGoogle(event: FormEvent) {
-        event.preventDefault()
-        signInWithGoogle()
+        try {
+            event.preventDefault()
+            await signInWithGoogle()
+        } catch (e) {
+            toast.error('Erro de conexão com o Google')
+        }
     }
 
     async function handleLikeQuestion(questionId: string, likeId: string | undefined) {
@@ -103,10 +108,7 @@ export function Room() {
             loading ? (
                 <Loading />
             ) : (
-                <div id='page-error'>
-                    <img src={errorImg} alt="error" />
-                    <h2>A sala buscada já foi encerrada.</h2>
-                </div>
+                <ErrorPage isRoomAdmin={true}/>
             )
         ) : (
             loading ? (

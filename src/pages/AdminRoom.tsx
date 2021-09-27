@@ -8,13 +8,14 @@ import "react-toastify/dist/ReactToastify.css";
 import logoImg from "../assets/images/logo.svg";
 import deleteImg from '../assets/images/delete.svg'
 import emptyQuestionsImg from '../assets/images/empty-questions.svg'
-import errorImg from '../assets/images/alert-circle.svg'
+
 
 // componentes
 import { Button } from "../components/Button";
 import { Question } from "../components/Question";
 import { RoomCode } from "../components/RoomCode";
 import { Loading } from "../components/Loading";
+import { ErrorPage } from "./ErrorPage";
 
 // hooks
 import { useRoom } from "../hooks/useRoom";
@@ -43,7 +44,6 @@ export function AdminRoom() {
     const params = useParams<Params>();
     const roomId = params.id;
 
-    console.log(loading)
     const { questions, title } = useRoom(roomId)
     useEffect(() => {
         async function checkAdminAndRoomIsFinished() {
@@ -126,10 +126,7 @@ export function AdminRoom() {
             )
         ) : (
             loading ? (<Loading />) : (
-                <div id='page-error'>
-                    <img src={errorImg} alt="error" />
-                    {isRoomAdmin ? (<h2>A sala buscada já foi encerrada.</h2>) : (<h2>Você não tem permissão para acessar essa rota.</h2>)}
-                </div>
+                <ErrorPage isRoomAdmin={isRoomAdmin}/>
             )
         )
     );

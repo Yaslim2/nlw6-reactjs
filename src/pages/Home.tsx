@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { toast } from "react-toastify";
@@ -28,10 +28,14 @@ export function Home() {
   const [roomCode, setRoomCode] = useState("");
 
   async function handleLoginAndRedirect() {
-    if (!user) {
-      await signInWithGoogle();
+    try {
+      if (!user) {
+        await signInWithGoogle();
+      }
+      history.push("/rooms/new");
+    } catch (e) {
+      toast.error('Erro de conexão com o Google')
     }
-    history.push("/rooms/new");
   }
 
   async function handleJoinRoom(event: FormEvent) {
