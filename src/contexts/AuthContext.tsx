@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { auth, firebase } from "../services/firebaseConnection";
 
+// toasts
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -23,29 +24,29 @@ export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthContextProvider(props: AuthContextProviderProps) {
   const [user, setUser] = useState<User>();
-  
-    useEffect(() => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          const { displayName, photoURL, uid } = user;
-  
-          if (!displayName || !photoURL) {
-            throw new Error("Missing information from Google Account");
-          }
-  
-          setUser({
-            id: uid,
-            name: displayName,
-            avatar: photoURL,
-          });
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        const { displayName, photoURL, uid } = user;
+
+        if (!displayName || !photoURL) {
+          throw new Error("Missing information from Google Account");
         }
-      });
-  
-      // para cancelar o evento de ouvinte (boa prática de programação)
-      return () => {
-        unsubscribe();
-      };
-    }, []);
+
+        setUser({
+          id: uid,
+          name: displayName,
+          avatar: photoURL,
+        });
+      }
+    });
+
+    // para cancelar o evento de ouvinte (boa prática de programação)
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   async function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -65,7 +66,8 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
         name: displayName,
         avatar: photoURL,
       });
-      toast.success("Usuário logado com sucesso!")
+
+      toast.success('Usuário logado com sucesso', { autoClose: 3000 })
     }
   }
 

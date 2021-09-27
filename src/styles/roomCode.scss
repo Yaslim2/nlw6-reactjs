@@ -9,6 +9,9 @@
 
 
     display: flex;
+    &:hover {
+        filter: brightness(0.9);
+    }
 
     div {
         background: #835afd;

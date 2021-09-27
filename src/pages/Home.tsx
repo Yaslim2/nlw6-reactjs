@@ -1,7 +1,7 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // imagens
@@ -39,6 +39,7 @@ export function Home() {
 
     if (roomCode.trim() === "") {
       toast.warn('Digite o código da sala')
+      setRoomCode('')
       return;
     }
 
@@ -46,7 +47,13 @@ export function Home() {
 
     if (!roomRef.exists()) {
       toast.error('Sala não encontrada')
+      setRoomCode('')
       return;
+    }
+
+    if (roomRef.val().endedAt) {
+      toast.warn('Sala já encerrada')
+      return
     }
 
     history.push(`rooms/${roomCode}`);
@@ -88,18 +95,6 @@ export function Home() {
           </form>
         </div>
       </main>
-      <ToastContainer
-        position="top-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='colored'
-      />
     </div>
   );
 }

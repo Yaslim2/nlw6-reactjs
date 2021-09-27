@@ -1,7 +1,7 @@
 import { Link, useHistory } from "react-router-dom";
 import { FormEvent, useState } from 'react'
 
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // imagens
@@ -40,7 +40,7 @@ export function NewRoom() {
       authorId: user?.id
     })
 
-    history.push(`/rooms/${firebaseRoom.key}`)
+    history.push(`/rooms/admin/${firebaseRoom.key}`)
   }
 
   return (
@@ -78,18 +78,6 @@ export function NewRoom() {
           </p>
         </div>
       </main>
-      <ToastContainer
-        position="top-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='colored'
-      />
     </div>
   );
 }
