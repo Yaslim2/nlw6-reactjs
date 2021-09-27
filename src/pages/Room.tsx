@@ -41,15 +41,22 @@ export function Room() {
 
     const [isFinished, setIsFinished] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [roomIdExists, setRoomIdExists] = useState(false)
+    
     useEffect(() => {
-        async function checkIsFinished() {
+        async function checkIsFinishedAndRoomExists() {
+            const roomExists = await database.ref(`rooms/${roomId}`).get()
+            if(roomExists.exists()) {
+                setRoomIdExists(true)
+            }
+
             const finished = await database.ref(`rooms/${roomId}/endedAt`).get()
             if (finished.exists()) {
                 setIsFinished(true)
             }
             setLoading(false)
         }
-        checkIsFinished()
+        checkIsFinishedAndRoomExists()
     }, [roomId])
 
     const { questions, title } = useRoom(roomId)
@@ -103,12 +110,12 @@ export function Room() {
     }
 
     return (
-        ((isFinished) ? (
+        ((isFinished && roomIdExists === false) ? (
 
             loading ? (
                 <Loading />
             ) : (
-                <ErrorPage isRoomAdmin={true}/>
+                <ErrorPage isRoomAdmin={true} isFinished={isFinished} roomIdExists={roomIdExists}/>
             )
         ) : (
             loading ? (
@@ -184,7 +191,6 @@ export function Room() {
                                 </div>
                             )}
                         </div>
-
                     </main>
                 </div>
             )

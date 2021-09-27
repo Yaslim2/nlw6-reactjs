@@ -165,9 +165,10 @@
 
 #page-error {
   display: flex;
+  flex: 1;
   align-items: center;
   flex-direction: column;
-  margin: 64px;
+  margin-top: 65px;
 
   > img {
     width: 120px;
@@ -177,5 +178,6 @@
   h2 {
     font-family: 'Poppins', sans-serif;
     margin-top: 16px;
+    color: #29292e;
   }
 }

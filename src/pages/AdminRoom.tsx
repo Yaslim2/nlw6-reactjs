@@ -28,6 +28,7 @@ import { database } from "../services/firebaseConnection";
 
 // css
 import "../styles/room.scss";
+import { toast } from "react-toastify";
 
 
 type Params = {
@@ -39,14 +40,23 @@ export function AdminRoom() {
     const [loading, setLoading] = useState(true)
     const [isRoomAdmin, setIsRoomAdmin] = useState(false)
     const [isFinished, setIsFinished] = useState(false)
+    const [roomIdExists, setRoomIdExists] = useState(false)
+
     const { user } = useAuth()
     const history = useHistory()
     const params = useParams<Params>();
+    
     const roomId = params.id;
 
     const { questions, title } = useRoom(roomId)
+    
     useEffect(() => {
-        async function checkAdminAndRoomIsFinished() {
+        async function checkErrors() {
+            const roomIdExists = await database.ref(`rooms/${roomId}`).get()
+            if(roomIdExists.exists()) {
+                setRoomIdExists(true)
+            }   
+
             const roomAdmin = await database.ref(`rooms/${roomId}/authorId`).get()
             if (roomAdmin.val() === user?.id) {
                 setIsRoomAdmin(true)
@@ -56,10 +66,11 @@ export function AdminRoom() {
             if (finished.exists()) {
                 setIsFinished(true)
             }
+            
             setLoading(false)
         }
 
-        checkAdminAndRoomIsFinished()
+        checkErrors()
 
     }, [roomId, user?.id])
 
@@ -67,6 +78,7 @@ export function AdminRoom() {
         await database.ref(`rooms/${roomId}`).update({
             endedAt: new Date()
         })
+        toast.success('Sala encerrada com sucesso')
         history.push('/')
     }
 
@@ -77,7 +89,7 @@ export function AdminRoom() {
     }
 
     return (
-        ((isRoomAdmin === true && isFinished === false)) ? (
+        (isRoomAdmin === true && isFinished === false && roomIdExists === true) ? (
             loading ? (
                 <Loading />
             ) : (
@@ -126,7 +138,7 @@ export function AdminRoom() {
             )
         ) : (
             loading ? (<Loading />) : (
-                <ErrorPage isRoomAdmin={isRoomAdmin}/>
+                <ErrorPage roomIdExists={roomIdExists} isFinished={isFinished} isRoomAdmin={isRoomAdmin}/>
             )
         )
     );

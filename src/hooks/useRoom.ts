@@ -41,38 +41,44 @@ export function useRoom(roomId: string) {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    const roomRef = database.ref(`rooms/${roomId}`);
+    async function load() {
+      const roomRef = await database.ref(`rooms/${roomId}`);
+      if ((await roomRef.get()).exists()) {
+        roomRef.on("value", (room) => {
+          const databaseRoom = room.val();
 
-    roomRef.on("value", (room) => {
-      const databaseRoom = room.val();
+          const firebaseQuestions: FirebaseQuestions =
+            databaseRoom.questions || {};
 
-      const firebaseQuestions: FirebaseQuestions = databaseRoom.questions || {};
+          const parsedQuestions = Object.entries(firebaseQuestions).map(
+            ([key, question]) => {
+              return {
+                id: key,
+                content: question.content,
+                author: question.author,
+                isHighlighted: question.isHighlighted,
+                isAnswered: question.isAnswered,
+                likeCount: Object.values(question.likes || {}).length,
+                likeId: Object.entries(question.likes || {}).find(
+                  ([key, like]) => like.authorId === user?.id
+                )?.[0],
+                hasLiked: Object.values(question.likes || {}).some(
+                  (like) => like.authorId === user?.id
+                ),
+              };
+            }
+          );
+          setTitle(databaseRoom.title);
+          setQuestions(parsedQuestions);
 
-      const parsedQuestions = Object.entries(firebaseQuestions).map(
-        ([key, question]) => {
-          return {
-            id: key,
-            content: question.content,
-            author: question.author,
-            isHighlighted: question.isHighlighted,
-            isAnswered: question.isAnswered,
-            likeCount: Object.values(question.likes || {}).length,
-            likeId: Object.entries(question.likes || {}).find(
-              ([key, like]) => like.authorId === user?.id
-            )?.[0],
-            hasLiked: Object.values(question.likes || {}).some(
-              (like) => like.authorId === user?.id
-            ),
+          return () => {
+            roomRef.off("value");
           };
-        }
-      );
-      setTitle(databaseRoom.title);
-      setQuestions(parsedQuestions);
-    });
+        });
+      }
+    }
 
-    return () => {
-      roomRef.off("value");
-    };
+    load();
   }, [roomId, user?.id]);
 
   return { questions, title };
